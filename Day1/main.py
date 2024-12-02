@@ -1,10 +1,8 @@
-import os
-
 # Part 1 of the advent of code
-file = open("./day1_input.txt",'r')
+file = open("./Day1/input.txt",'r')
 content = file.read()
 
-split_list = [i.split("   ") for i in content.split("\n")][0:-1]
+split_list = [i.split("   ") for i in content.split("\n")]
 first_list = [i[0] for i in split_list]
 second_list = [i[1] for i in split_list]
 first_list.sort()
