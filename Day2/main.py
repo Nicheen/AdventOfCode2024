@@ -1,40 +1,88 @@
-file = open("./Day2/input.txt",'r')
-content = file.read()
+# Part 1 & Part 2
+# The levels are either all increasing or all decreasing.
+# Any two adjacent levels differ by at least one and at most three.
 
-split_list = content.split("\n")
+def check_values_part_1(values) -> bool:
+    previous_value = 0
+    level_counter = 0
+    for i, value in enumerate(values):
+        if i > 0:
+            if previous_value + 3 >= value >= previous_value + 1:
+                level_counter += 1
+            elif previous_value - 3 <= value <= previous_value - 1:
+                level_counter -= 1
+            else:
+                print(f"{values}: Unsafe because of {previous_value} and {value} ==> {abs(previous_value - value)}")
+                return False
 
-def is_safe(previous, current, future) -> bool:
-    diff_current_previous = abs(current - previous)
-    diff_current_future = abs(current - future)
-    return (1 <= diff_current_previous <= 3 and 1 <= diff_current_future <= 3)
+            if level_counter not in [i, -i]:
+                print(f"{values}: Sometime is wrong here: {level_counter}, {i}, {-i}")
+                return False
 
-def is_increasing(previous, current, future) -> bool:
-    return (previous < current) and (current < future)
+            if i == len(values) - 1: 
+                return True
 
-def check(list) -> bool:
-    return all(i == list[0] for i in list)
+        previous_value = value
 
-n_safe = 0
-for entry in split_list:
+def check_values_part_2(values, index=-1, printable=False) -> int:
+    previous_value = 0
+    level_counter = 0
 
-    entry_list = entry.split(" ")
+    if printable:
+        a = values.copy()
+        print(f"{a} without {a.pop(index)}", end="\t")
 
-    l = []
-    s = []
+    if index != -1: 
+        del values[index]
+    
+    for i, value in enumerate(values):
+        if i > 0:
+            if previous_value + 3 >= value >= previous_value + 1:
+                level_counter += 1
+            elif previous_value - 3 <= value <= previous_value - 1:
+                level_counter -= 1
+            else:
+                if printable: 
+                    print("UNSAFE")
+                return i
 
-    for i, number_text in enumerate(entry_list):
-        
-        if 0 < i < len(entry_list) - 1:
+            if level_counter not in [i, -i]:
+                if printable: 
+                    print("UNSAFE")
+                return i
 
-            current_number  = int(number_text)
-            previous_number = int(entry_list[i - 1])
-            future_number   = int(entry_list[i + 1])
+            if i == len(values) - 1:
+                if printable: 
+                    print("SAFE")
+                return -1
 
-            s.append(is_safe(previous_number, current_number, future_number))   
-            l.append(is_increasing(previous_number, current_number, future_number))
+        previous_value = value
+if __name__ == "__main__":
+    PART1 = False
+    PART2 = not PART1
+    file = open("./Day2/input.txt",'r')
+    content = file.read()
+    list_of_content = content.split('\n')
 
-    print(l, s)
-    if check(l) and all(s):
-        n_safe += 1
+    if PART1:
+        counter = 0
+        for row in list_of_content:
+            values = [int(nr) for nr in row.split(" ")]
+            counter += check_values_part_1(values)
+        print(counter)
 
-print(n_safe)
+    if PART2:
+        counter = 0
+        for row in list_of_content:
+            values = [int(nr) for nr in row.split(" ")]
+            returned_value = check_values_part_2(values)
+            if returned_value >= 0:
+                new_returned_value = check_values_part_2(values, returned_value, True)
+                if new_returned_value == -1:
+                    counter += 1
+            elif returned_value == -1:
+                counter += 1
+        print("\n", counter)
+
+
+
